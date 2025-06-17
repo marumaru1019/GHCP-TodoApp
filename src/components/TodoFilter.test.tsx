@@ -8,6 +8,9 @@ describe('TodoFilter', () => {
     onFilterChange: jest.fn(),
     activeTodosCount: 2,
     completedTodosCount: 3,
+    overdueTodosCount: 1,
+    todayTodosCount: 0,
+    noDueDateTodosCount: 1,
     onClearCompleted: jest.fn(),
   };
 
@@ -41,7 +44,8 @@ describe('TodoFilter', () => {
 
   it('activeTodosCountとcompletedTodosCountが0のときバッジと削除ボタンが表示されない', () => {
     render(
-      <TodoFilter {...defaultProps} activeTodosCount={0} completedTodosCount={0} />
+      <TodoFilter {...defaultProps} activeTodosCount={0} completedTodosCount={0} 
+                  overdueTodosCount={0} todayTodosCount={0} noDueDateTodosCount={0} />
     );
     expect(screen.queryByText('0')).not.toBeInTheDocument();
     expect(screen.queryByText('完了済みを削除')).not.toBeInTheDocument();
