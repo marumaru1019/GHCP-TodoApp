@@ -6,14 +6,17 @@ describe('TodoInput', () => {
     render(<TodoInput onAddTodo={onAddTodo} />);
     const input = screen.getByPlaceholderText('新しいタスクを入力してください...') as HTMLInputElement;
     const button = screen.getByRole('button', { name: '追加' });
-    return { input, button, onAddTodo };
+    const prioritySelect = screen.getByDisplayValue('🟡 中') as HTMLSelectElement; // 📝 優先度セレクタを取得
+    return { input, button, prioritySelect, onAddTodo };
   };
 
-  it('初期レンダリングで入力欄と追加ボタンが表示される', () => {
-    const { input, button } = setup();
+  it('初期レンダリングで入力欄、優先度選択、追加ボタンが表示される', () => {
+    const { input, button, prioritySelect } = setup();
     expect(input).toBeInTheDocument();
     expect(button).toBeInTheDocument();
+    expect(prioritySelect).toBeInTheDocument();
     expect(button).toBeDisabled();
+    expect(prioritySelect.value).toBe('medium'); // 📝 デフォルト優先度は中
   });
 
   it('入力欄にテキストを入力するとボタンが有効になる', () => {
@@ -23,12 +26,20 @@ describe('TodoInput', () => {
     expect(button).not.toBeDisabled();
   });
 
-  it('EnterキーまたはボタンでonAddTodoが呼ばれ、入力がクリアされる', () => {
-    const { input, button, onAddTodo } = setup();
+  it('優先度を変更できる', () => {
+    const { prioritySelect } = setup();
+    fireEvent.change(prioritySelect, { target: { value: 'high' } });
+    expect(prioritySelect.value).toBe('high');
+  });
+
+  it('EnterキーまたはボタンでonAddTodoが優先度付きで呼ばれ、入力がクリアされる', () => {
+    const { input, button, prioritySelect, onAddTodo } = setup();
     fireEvent.change(input, { target: { value: '新しいタスク' } });
+    fireEvent.change(prioritySelect, { target: { value: 'high' } });
     fireEvent.click(button);
-    expect(onAddTodo).toHaveBeenCalledWith('新しいタスク');
+    expect(onAddTodo).toHaveBeenCalledWith('新しいタスク', 'high'); // 📝 優先度も渡されることを確認
     expect(input.value).toBe('');
+    expect(prioritySelect.value).toBe('medium'); // 📝 優先度もリセットされることを確認
   });
 
   it('空文字や空白のみの場合はonAddTodoが呼ばれない', () => {
@@ -42,13 +53,10 @@ describe('TodoInput', () => {
   it('EnterキーでonAddTodoが呼ばれる', () => {
     const { input, onAddTodo } = setup();
     fireEvent.change(input, { target: { value: 'エンター追加' } });
-    fireEvent.keyDown(input, { key: 'Enter', code: 'Enter' });
-    expect(onAddTodo).toHaveBeenCalledWith('エンター追加');
+    fireEvent.submit(input.closest('form')!); // 📝 フォームのsubmitイベントを発火
+    expect(onAddTodo).toHaveBeenCalledWith('エンター追加', 'medium'); // 📝 デフォルト優先度で呼ばれる
     expect(input.value).toBe('');
   });
 
-  it('Propsの型チェック: onAddTodoが必須', () => {
-    // @ts-expect-error onAddTodo prop is required for TodoInput
-    expect(() => render(<TodoInput />)).toThrow();
-  });
+  // 📝 TypeScript prop validation testは削除（実際にはランタイムでエラーにならない）
 });

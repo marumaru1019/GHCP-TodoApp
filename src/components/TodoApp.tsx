@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Todo, TodoFilter } from '@/types/todo';
+import { Todo, TodoFilter, TodoPriority } from '@/types/todo';
 import { TodoItem } from './TodoItem';
 import { TodoInput } from './TodoInput';
 import { TodoFilter as TodoFilterComponent } from './TodoFilter';
@@ -10,12 +10,14 @@ export function TodoApp() {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [filter, setFilter] = useState<TodoFilter>('all');
 
-  const addTodo = (text: string) => {
+  // 📝 優先度付きでタスクを追加する関数
+  const addTodo = (text: string, priority: TodoPriority = 'medium') => {
     const newTodo: Todo = {
       id: crypto.randomUUID(),
       text: text.trim(),
       completed: false,
       createdAt: new Date(),
+      priority, // 📝 優先度を追加
     };
     setTodos(prev => [newTodo, ...prev]);
   };
@@ -44,11 +46,25 @@ export function TodoApp() {
     setTodos(prev => prev.filter(todo => !todo.completed));
   };
 
-  const filteredTodos = todos.filter(todo => {
-    if (filter === 'active') return !todo.completed;
-    if (filter === 'completed') return todo.completed;
-    return true;
-  });
+  // 📝 優先度による並び替え関数
+  const sortByPriority = (todos: Todo[]) => {
+    const priorityOrder = { high: 0, medium: 1, low: 2 };
+    return [...todos].sort((a, b) => {
+      // 📝 優先度で並び替え（高 > 中 > 低）
+      const priorityDiff = priorityOrder[a.priority] - priorityOrder[b.priority];
+      if (priorityDiff !== 0) return priorityDiff;
+      // 📝 同じ優先度なら作成日時で並び替え（新しい順）
+      return b.createdAt.getTime() - a.createdAt.getTime();
+    });
+  };
+
+  const filteredTodos = sortByPriority(
+    todos.filter(todo => {
+      if (filter === 'active') return !todo.completed;
+      if (filter === 'completed') return todo.completed;
+      return true;
+    })
+  );
 
   const activeTodosCount = todos.filter(todo => !todo.completed).length;
   const completedTodosCount = todos.filter(todo => todo.completed).length;
