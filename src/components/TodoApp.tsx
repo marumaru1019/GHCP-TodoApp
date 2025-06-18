@@ -1,14 +1,31 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Todo, TodoFilter } from '@/types/todo';
 import { TodoItem } from './TodoItem';
 import { TodoInput } from './TodoInput';
 import { TodoFilter as TodoFilterComponent } from './TodoFilter';
+import { loadTodos, saveTodos } from '@/lib/localStorage';
 
 export function TodoApp() {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [filter, setFilter] = useState<TodoFilter>('all');
+
+  // 📝 初回レンダリング時にローカルストレージからデータを読み込み
+  useEffect(() => {
+    const storedTodos = loadTodos();
+    if (storedTodos.length > 0) {
+      setTodos(storedTodos);
+    }
+  }, []);
+
+  // 📝 todosが変更されるたびにローカルストレージに自動保存
+  useEffect(() => {
+    // 🚩 初回レンダリング時の空配列保存を防ぐ条件
+    if (todos.length > 0 || localStorage.getItem('todoApp_tasks')) {
+      saveTodos(todos);
+    }
+  }, [todos]);
 
   const addTodo = (text: string) => {
     const newTodo: Todo = {
