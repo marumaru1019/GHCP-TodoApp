@@ -68,7 +68,8 @@ export const useSearch = () => {
   const searchTodos = useMemo(() => {
     return (todos: Todo[]): SearchResult[] => {
       if (!searchOptions.query && filterOptions.status === 'all' && 
-          filterOptions.categories.length === 0 && filterOptions.tags.length === 0) {
+          filterOptions.categories.length === 0 && filterOptions.tags.length === 0 &&
+          !filterOptions.dateRange.start && !filterOptions.dateRange.end) {
         // 🚩 検索条件が空の場合は全て返す
         return todos.map(todo => ({
           todo,
@@ -180,9 +181,11 @@ export const useSearch = () => {
       // 📝 スコア順でソート
       results.sort((a, b) => b.score - a.score);
 
-      // 🔍 検索履歴に追加
+      // 🔍 検索履歴に追加（非同期で実行して無限ループを回避）
       if (searchOptions.query) {
-        addToHistory(searchOptions.query, results.length);
+        setTimeout(() => {
+          addToHistory(searchOptions.query, results.length);
+        }, 0);
       }
 
       return results;

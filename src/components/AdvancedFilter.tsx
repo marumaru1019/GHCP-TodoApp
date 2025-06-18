@@ -103,10 +103,11 @@ export function AdvancedFilter({
           <div className="p-3 border-t border-gray-200 dark:border-gray-600 space-y-3">
             {/* 📝 日付タイプ選択 */}
             <div>
-              <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label htmlFor="date-type" className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
                 日付の種類
               </label>
               <select
+                id="date-type"
                 value={filterOptions.dateRange.type}
                 onChange={(e) => updateDateRangeType(e.target.value as 'created' | 'updated' | 'due')}
                 className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md
@@ -120,10 +121,11 @@ export function AdvancedFilter({
 
             {/* 📝 開始日 */}
             <div>
-              <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label htmlFor="start-date" className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
                 開始日
               </label>
               <input
+                id="start-date"
                 type="date"
                 value={formatDateForInput(filterOptions.dateRange.start)}
                 onChange={(e) => updateDateRange('start', e.target.value)}
@@ -134,10 +136,11 @@ export function AdvancedFilter({
 
             {/* 📝 終了日 */}
             <div>
-              <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label htmlFor="end-date" className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
                 終了日
               </label>
               <input
+                id="end-date"
                 type="date"
                 value={formatDateForInput(filterOptions.dateRange.end)}
                 onChange={(e) => updateDateRange('end', e.target.value)}
