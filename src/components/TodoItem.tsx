@@ -31,55 +31,87 @@ export function TodoItem({ todo, onToggle, onDelete, onEdit }: TodoItemProps) {
   };
 
   return (
-    <div className={`flex items-center gap-3 p-3 border border-gray-200 dark:border-gray-600 rounded-lg
+    <div className={`p-3 border border-gray-200 dark:border-gray-600 rounded-lg
                      bg-gray-50 dark:bg-gray-700 transition-all duration-200
-                     ${todo.completed ? 'opacity-75' : ''}`}>
-      <input
-        type="checkbox"
-        checked={todo.completed}
-        onChange={() => onToggle(todo.id)}        className="w-5 h-5 text-[#ff0033] bg-gray-100 border-gray-300 rounded 
-                   focus:ring-[#ff0033] dark:focus:ring-[#ff4d6e] dark:ring-offset-gray-800 
-                   focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-      />
+                     ${todo.completed ? 'opacity-75' : ''}
+                     ${todo.category ? 'border-l-4' : ''}`}
+         style={todo.category ? { borderLeftColor: todo.category.color } : {}}>
       
-      {isEditing ? (
-        <input
-          type="text"
-          value={editText}
-          onChange={(e) => setEditText(e.target.value)}
-          onBlur={handleEdit}
-          onKeyDown={handleKeyDown}
-          autoFocus          className="flex-1 px-2 py-1 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-600
-                     border border-gray-300 dark:border-gray-500 rounded focus:outline-none 
-                     focus:ring-2 focus:ring-[#ff0033]"
-        />
-      ) : (
-        <span
-          onClick={() => setIsEditing(true)}
-          className={`flex-1 cursor-text select-none ${
-            todo.completed 
-              ? 'line-through text-gray-500 dark:text-gray-400' 
-              : 'text-gray-900 dark:text-gray-100'
-          }`}
-        >
-          {todo.text}
-        </span>
+      {/* 📝 カテゴリとタグの表示エリア */}
+      {(todo.category || todo.tags.length > 0) && (
+        <div className="flex flex-wrap items-center gap-2 mb-2">
+          {/* 📝 カテゴリバッジ */}
+          {todo.category && (
+            <span 
+              className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-white"
+              style={{ backgroundColor: todo.category.color }}
+            >
+              {todo.category.icon} {todo.category.name}
+            </span>
+          )}
+          
+          {/* 📝 タグチップ */}
+          {todo.tags.map(tag => (
+            <span
+              key={tag.id}
+              className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium text-white"
+              style={{ backgroundColor: tag.color }}
+            >
+              {tag.name}
+            </span>
+          ))}
+        </div>
       )}
-      
-      <div className="flex gap-2">
-        <button
-          onClick={() => setIsEditing(!isEditing)}          className="px-3 py-1 text-sm text-[#ff0033] dark:text-[#ff4d6e] hover:bg-[#fff0f3] 
-                     dark:hover:bg-[#4d000f] rounded transition-colors duration-200"
-        >
-          {isEditing ? 'キャンセル' : '編集'}
-        </button>
-        <button
-          onClick={() => onDelete(todo.id)}
-          className="px-3 py-1 text-sm text-red-600 dark:text-red-400 hover:bg-red-100 
-                     dark:hover:bg-red-900 rounded transition-colors duration-200"
-        >
-          削除
-        </button>
+
+      {/* 📝 メインコンテンツエリア */}
+      <div className="flex items-center gap-3">
+        <input
+          type="checkbox"
+          checked={todo.completed}
+          onChange={() => onToggle(todo.id)}          className="w-5 h-5 text-[#ff0033] bg-gray-100 border-gray-300 rounded 
+                     focus:ring-[#ff0033] dark:focus:ring-[#ff4d6e] dark:ring-offset-gray-800 
+                     focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+        />
+        
+        {isEditing ? (
+          <input
+            type="text"
+            value={editText}
+            onChange={(e) => setEditText(e.target.value)}
+            onBlur={handleEdit}
+            onKeyDown={handleKeyDown}
+            autoFocus            className="flex-1 px-2 py-1 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-600
+                       border border-gray-300 dark:border-gray-500 rounded focus:outline-none 
+                       focus:ring-2 focus:ring-[#ff0033]"
+          />
+        ) : (
+          <span
+            onClick={() => setIsEditing(true)}
+            className={`flex-1 cursor-text select-none ${
+              todo.completed 
+                ? 'line-through text-gray-500 dark:text-gray-400' 
+                : 'text-gray-900 dark:text-gray-100'
+            }`}
+          >
+            {todo.text}
+          </span>
+        )}
+        
+        <div className="flex gap-2">
+          <button
+            onClick={() => setIsEditing(!isEditing)}            className="px-3 py-1 text-sm text-[#ff0033] dark:text-[#ff4d6e] hover:bg-[#fff0f3] 
+                       dark:hover:bg-[#4d000f] rounded transition-colors duration-200"
+          >
+            {isEditing ? 'キャンセル' : '編集'}
+          </button>
+          <button
+            onClick={() => onDelete(todo.id)}
+            className="px-3 py-1 text-sm text-red-600 dark:text-red-400 hover:bg-red-100 
+                       dark:hover:bg-red-900 rounded transition-colors duration-200"
+          >
+            削除
+          </button>
+        </div>
       </div>
     </div>
   );

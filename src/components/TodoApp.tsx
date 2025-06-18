@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { Todo, TodoFilter } from '@/types/todo';
+import { Todo, TodoFilter, TodoCategory, TodoTag } from '@/types/todo';
+import { defaultCategories, defaultTags } from '@/constants/categories';
 import { TodoItem } from './TodoItem';
 import { TodoInput } from './TodoInput';
 import { TodoFilter as TodoFilterComponent } from './TodoFilter';
@@ -9,16 +10,30 @@ import { TodoFilter as TodoFilterComponent } from './TodoFilter';
 export function TodoApp() {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [filter, setFilter] = useState<TodoFilter>('all');
+  const [categories] = useState<TodoCategory[]>(defaultCategories);
+  const [tags, setTags] = useState<TodoTag[]>(defaultTags);
 
   // 📝 addTodo関数を拡張してカテゴリとタグに対応
-  const addTodo = (text: string) => {
+  const addTodo = (text: string, category?: TodoCategory, selectedTags?: TodoTag[]) => {
     const newTodo: Todo = {
       id: crypto.randomUUID(),
       text: text.trim(),
       completed: false,
       createdAt: new Date(),
-      tags: [], // 📝 新規Todoは空のタグ配列で開始
+      category,
+      tags: selectedTags || [],
     };
+    
+    // 📝 新しいタグがあれば tags 配列に追加
+    if (selectedTags) {
+      const newTags = selectedTags.filter(tag => 
+        !tags.find(existingTag => existingTag.id === tag.id)
+      );
+      if (newTags.length > 0) {
+        setTags(prev => [...prev, ...newTags]);
+      }
+    }
+    
     setTodos(prev => [newTodo, ...prev]);
   };
 
@@ -62,7 +77,11 @@ export function TodoApp() {
       </h1>
       
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-        <TodoInput onAddTodo={addTodo} />
+        <TodoInput 
+          onAddTodo={addTodo} 
+          categories={categories}
+          tags={tags}
+        />
         
         <div className="mt-6">
           <TodoFilterComponent
