@@ -1,5 +1,5 @@
-// 📝 優先度の型定義を追加
-export type TodoPriority = 'high' | 'medium' | 'low';
+// 📝 優先度の型定義を追加（最重要を追加）
+export type TodoPriority = 'critical' | 'high' | 'medium' | 'low';
 
 export interface Todo {
   id: string;

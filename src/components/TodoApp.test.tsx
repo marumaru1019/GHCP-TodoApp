@@ -19,6 +19,23 @@ describe('TodoApp - Priority Functionality', () => {
     jest.useRealTimers();
   });
 
+  it('最重要優先度付きでタスクを追加できる', () => {
+    render(<TodoApp />);
+    
+    const input = screen.getByPlaceholderText('新しいタスクを入力してください...');
+    const prioritySelect = screen.getByDisplayValue('🟡 中');
+    const addButton = screen.getByText('追加');
+
+    // 📝 最重要優先度のタスクを追加
+    fireEvent.change(input, { target: { value: '最重要タスク' } });
+    fireEvent.change(prioritySelect, { target: { value: 'critical' } });
+    fireEvent.click(addButton);
+
+    // 📝 タスクが表示され、優先度アイコンが正しく表示されることを確認
+    expect(screen.getByText('最重要タスク')).toBeInTheDocument();
+    expect(screen.getByText('⚫')).toBeInTheDocument();
+  });
+
   it('優先度付きでタスクを追加できる', () => {
     render(<TodoApp />);
     
@@ -36,14 +53,14 @@ describe('TodoApp - Priority Functionality', () => {
     expect(screen.getByText('🔴')).toBeInTheDocument();
   });
 
-  it('優先度順（高→中→低）でタスクが並び替えられる', () => {
+  it('優先度順（最重要→高→中→低）でタスクが並び替えられる', () => {
     render(<TodoApp />);
     
     const input = screen.getByPlaceholderText('新しいタスクを入力してください...');
     const prioritySelect = screen.getByDisplayValue('🟡 中');
     const addButton = screen.getByText('追加');
 
-    // 📝 低、中、高の順でタスクを追加（逆順で追加）
+    // 📝 低、中、高、最重要の順でタスクを追加（逆順で追加）
     fireEvent.change(input, { target: { value: '低優先度タスク' } });
     fireEvent.change(prioritySelect, { target: { value: 'low' } });
     fireEvent.click(addButton);
@@ -56,11 +73,16 @@ describe('TodoApp - Priority Functionality', () => {
     fireEvent.change(prioritySelect, { target: { value: 'high' } });
     fireEvent.click(addButton);
 
-    // 📝 タスクの順序を確認（高→中→低）
-    const tasks = screen.getAllByText(/優先度タスク/);
-    expect(tasks[0]).toHaveTextContent('高優先度タスク');
-    expect(tasks[1]).toHaveTextContent('中優先度タスク');
-    expect(tasks[2]).toHaveTextContent('低優先度タスク');
+    fireEvent.change(input, { target: { value: '最重要タスク' } });
+    fireEvent.change(prioritySelect, { target: { value: 'critical' } });
+    fireEvent.click(addButton);
+
+    // 📝 タスクの順序を確認（最重要→高→中→低）
+    const tasks = screen.getAllByText(/優先度タスク|最重要タスク/);
+    expect(tasks[0]).toHaveTextContent('最重要タスク');
+    expect(tasks[1]).toHaveTextContent('高優先度タスク');
+    expect(tasks[2]).toHaveTextContent('中優先度タスク');
+    expect(tasks[3]).toHaveTextContent('低優先度タスク');
   });
 
   it('同じ優先度のタスクは作成日時順で並び替えられる', () => {
@@ -96,8 +118,8 @@ describe('TodoApp - Priority Functionality', () => {
     const addButton = screen.getByText('追加');
 
     // 📝 複数の優先度でタスクを追加
-    fireEvent.change(input, { target: { value: '高優先度タスク' } });
-    fireEvent.change(prioritySelect, { target: { value: 'high' } });
+    fireEvent.change(input, { target: { value: '最重要タスク' } });
+    fireEvent.change(prioritySelect, { target: { value: 'critical' } });
     fireEvent.click(addButton);
 
     fireEvent.change(input, { target: { value: '低優先度タスク' } });
@@ -114,6 +136,6 @@ describe('TodoApp - Priority Functionality', () => {
 
     // 📝 完了していないタスクのみが表示されることを確認
     expect(screen.getByText('低優先度タスク')).toBeInTheDocument();
-    expect(screen.queryByText('高優先度タスク')).not.toBeInTheDocument();
+    expect(screen.queryByText('最重要タスク')).not.toBeInTheDocument();
   });
 });

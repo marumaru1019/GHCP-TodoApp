@@ -46,11 +46,11 @@ export function TodoApp() {
     setTodos(prev => prev.filter(todo => !todo.completed));
   };
 
-  // 📝 優先度による並び替え関数
+  // 📝 優先度による並び替え関数（最重要を追加）
   const sortByPriority = (todos: Todo[]) => {
-    const priorityOrder = { high: 0, medium: 1, low: 2 };
+    const priorityOrder = { critical: 0, high: 1, medium: 2, low: 3 };
     return [...todos].sort((a, b) => {
-      // 📝 優先度で並び替え（高 > 中 > 低）
+      // 📝 優先度で並び替え（最重要 > 高 > 中 > 低）
       const priorityDiff = priorityOrder[a.priority] - priorityOrder[b.priority];
       if (priorityDiff !== 0) return priorityDiff;
       // 📝 同じ優先度なら作成日時で並び替え（新しい順）

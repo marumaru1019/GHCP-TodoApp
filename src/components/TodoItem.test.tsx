@@ -31,6 +31,12 @@ describe('TodoItem', () => {
     expect(screen.getByText('削除')).toBeInTheDocument();
   });
 
+  it('最重要優先度のタスクに黒いアイコンが表示される', () => {
+    const criticalPriorityTodo = { ...mockTodo, priority: 'critical' as const };
+    render(<TodoItem {...defaultProps} todo={criticalPriorityTodo} />);
+    expect(screen.getByText('⚫')).toBeInTheDocument();
+  });
+
   it('高優先度のタスクに赤いアイコンが表示される', () => {
     const highPriorityTodo = { ...mockTodo, priority: 'high' as const };
     render(<TodoItem {...defaultProps} todo={highPriorityTodo} />);

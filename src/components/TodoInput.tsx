@@ -32,7 +32,7 @@ export function TodoInput({ onAddTodo }: TodoInputProps) {
                    focus:outline-none focus:ring-2 focus:ring-[#ff0033] focus:border-transparent
                    placeholder-gray-500 dark:placeholder-gray-400"
       />
-      {/* 📝 優先度選択ドロップダウンを追加 */}
+      {/* 📝 優先度選択ドロップダウンを追加（最重要を追加） */}
       <select
         value={priority}
         onChange={(e) => setPriority(e.target.value as TodoPriority)}
@@ -40,6 +40,7 @@ export function TodoInput({ onAddTodo }: TodoInputProps) {
                    bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100
                    focus:outline-none focus:ring-2 focus:ring-[#ff0033] focus:border-transparent"
       >
+        <option value="critical">⚫ 最重要</option>
         <option value="high">🔴 高</option>
         <option value="medium">🟡 中</option>
         <option value="low">🟢 低</option>

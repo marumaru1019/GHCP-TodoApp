@@ -14,9 +14,11 @@ export function TodoItem({ todo, onToggle, onDelete, onEdit }: TodoItemProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState(todo.text);
 
-  // 📝 優先度に応じたスタイリング関数
+  // 📝 優先度に応じたスタイリング関数（最重要を追加）
   const getPriorityDisplay = (priority: string) => {
     switch (priority) {
+      case 'critical':
+        return { icon: '⚫', color: 'border-l-gray-800', bg: 'bg-gray-100 dark:bg-gray-800/50' };
       case 'high':
         return { icon: '🔴', color: 'border-l-red-500', bg: 'bg-red-50 dark:bg-red-900/20' };
       case 'medium':
@@ -59,8 +61,8 @@ export function TodoItem({ todo, onToggle, onDelete, onEdit }: TodoItemProps) {
                    focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
       />
       
-      {/* 📝 優先度アイコンを追加 */}
-      <span className="text-lg" title={`優先度: ${todo.priority === 'high' ? '高' : todo.priority === 'medium' ? '中' : '低'}`}>
+      {/* 📝 優先度アイコンを追加（最重要を含む） */}
+      <span className="text-lg" title={`優先度: ${todo.priority === 'critical' ? '最重要' : todo.priority === 'high' ? '高' : todo.priority === 'medium' ? '中' : '低'}`}>
         {priorityStyle.icon}
       </span>
       

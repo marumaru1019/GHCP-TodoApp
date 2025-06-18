@@ -26,8 +26,10 @@ describe('TodoInput', () => {
     expect(button).not.toBeDisabled();
   });
 
-  it('優先度を変更できる', () => {
+  it('優先度を変更できる（最重要を含む）', () => {
     const { prioritySelect } = setup();
+    fireEvent.change(prioritySelect, { target: { value: 'critical' } });
+    expect(prioritySelect.value).toBe('critical');
     fireEvent.change(prioritySelect, { target: { value: 'high' } });
     expect(prioritySelect.value).toBe('high');
   });
