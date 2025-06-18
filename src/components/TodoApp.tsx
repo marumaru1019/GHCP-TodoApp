@@ -10,12 +10,14 @@ export function TodoApp() {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [filter, setFilter] = useState<TodoFilter>('all');
 
+  // 📝 addTodo関数を拡張してカテゴリとタグに対応
   const addTodo = (text: string) => {
     const newTodo: Todo = {
       id: crypto.randomUUID(),
       text: text.trim(),
       completed: false,
       createdAt: new Date(),
+      tags: [], // 📝 新規Todoは空のタグ配列で開始
     };
     setTodos(prev => [newTodo, ...prev]);
   };
