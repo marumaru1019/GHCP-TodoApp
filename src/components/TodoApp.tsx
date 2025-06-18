@@ -5,6 +5,7 @@ import { Todo, TodoFilter } from '@/types/todo';
 import { TodoItem } from './TodoItem';
 import { TodoInput } from './TodoInput';
 import { TodoFilter as TodoFilterComponent } from './TodoFilter';
+import { DataManagement } from './DataManagement';
 import { loadTodos, saveTodos } from '@/lib/localStorage';
 
 export function TodoApp() {
@@ -61,6 +62,16 @@ export function TodoApp() {
     setTodos(prev => prev.filter(todo => !todo.completed));
   };
 
+  // 📝 データインポート処理
+  const handleImport = (importedTodos: Todo[]) => {
+    setTodos(importedTodos);
+  };
+
+  // 📝 データクリア処理
+  const handleClear = () => {
+    setTodos([]);
+  };
+
   const filteredTodos = todos.filter(todo => {
     if (filter === 'active') return !todo.completed;
     if (filter === 'completed') return todo.completed;
@@ -72,9 +83,16 @@ export function TodoApp() {
 
   return (
     <div className="max-w-2xl mx-auto p-6">
-      <h1 className="text-4xl font-bold text-center mb-8 text-gray-800 dark:text-gray-200">
-        Todo App
-      </h1>
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-4xl font-bold text-gray-800 dark:text-gray-200">
+          Todo App
+        </h1>
+        <DataManagement
+          todos={todos}
+          onImport={handleImport}
+          onClear={handleClear}
+        />
+      </div>
       
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
         <TodoInput onAddTodo={addTodo} />
