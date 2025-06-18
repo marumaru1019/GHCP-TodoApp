@@ -5,6 +5,7 @@ import { Todo, TodoFilter } from '@/types/todo';
 import { TodoItem } from './TodoItem';
 import { TodoInput } from './TodoInput';
 import { TodoFilter as TodoFilterComponent } from './TodoFilter';
+import { ThemeSettings } from './ThemeSettings';
 
 export function TodoApp() {
   const [todos, setTodos] = useState<Todo[]>([]);
@@ -55,9 +56,13 @@ export function TodoApp() {
 
   return (
     <div className="max-w-2xl mx-auto p-6">
-      <h1 className="text-4xl font-bold text-center mb-8 text-gray-800 dark:text-gray-200">
-        Todo App
-      </h1>
+      {/* 📝 ヘッダー部分にテーマ設定を追加 */}
+      <div className="flex items-center justify-between mb-8">
+        <h1 className="text-4xl font-bold text-gray-800 dark:text-gray-200">
+          Todo App
+        </h1>
+        <ThemeSettings />
+      </div>
       
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
         <TodoInput onAddTodo={addTodo} />
