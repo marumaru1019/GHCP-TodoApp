@@ -7,11 +7,17 @@ import { TodoItem } from './TodoItem';
 import { TodoInput } from './TodoInput';
 import { TodoFilter as TodoFilterComponent } from './TodoFilter';
 
+import { CategoryTagFilter } from './CategoryTagFilter';
+
 export function TodoApp() {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [filter, setFilter] = useState<TodoFilter>('all');
   const [categories] = useState<TodoCategory[]>(defaultCategories);
   const [tags, setTags] = useState<TodoTag[]>(defaultTags);
+  
+  // 📝 カテゴリ・タグフィルタの状態
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
   // 📝 addTodo関数を拡張してカテゴリとタグに対応
   const addTodo = (text: string, category?: TodoCategory, selectedTags?: TodoTag[]) => {
@@ -61,9 +67,27 @@ export function TodoApp() {
     setTodos(prev => prev.filter(todo => !todo.completed));
   };
 
+  // 📝 拡張されたフィルタリングロジック - 完了状態、カテゴリ、タグ全てに対応
   const filteredTodos = todos.filter(todo => {
-    if (filter === 'active') return !todo.completed;
-    if (filter === 'completed') return todo.completed;
+    // 📝 完了状態フィルタ
+    if (filter === 'active' && todo.completed) return false;
+    if (filter === 'completed' && !todo.completed) return false;
+    
+    // 📝 カテゴリフィルタ
+    if (selectedCategories.length > 0) {
+      if (!todo.category || !selectedCategories.includes(todo.category.id)) {
+        return false;
+      }
+    }
+    
+    // 📝 タグフィルタ（選択されたタグのいずれかを含む場合にマッチ）
+    if (selectedTags.length > 0) {
+      const todoTagIds = todo.tags.map(tag => tag.id);
+      if (!selectedTags.some(tagId => todoTagIds.includes(tagId))) {
+        return false;
+      }
+    }
+    
     return true;
   });
 
@@ -90,6 +114,18 @@ export function TodoApp() {
             activeTodosCount={activeTodosCount}
             completedTodosCount={completedTodosCount}
             onClearCompleted={clearCompleted}
+          />
+        </div>
+
+        {/* 📝 カテゴリ・タグフィルタの追加 */}
+        <div className="mt-6">
+          <CategoryTagFilter
+            categories={categories}
+            tags={tags}
+            selectedCategories={selectedCategories}
+            selectedTags={selectedTags}
+            onCategoryFilterChange={setSelectedCategories}
+            onTagFilterChange={setSelectedTags}
           />
         </div>
 

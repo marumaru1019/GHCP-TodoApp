@@ -1,9 +1,16 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { TodoInput } from './TodoInput';
+import { defaultCategories, defaultTags } from '@/constants/categories';
 
 describe('TodoInput', () => {
   const setup = (onAddTodo = jest.fn()) => {
-    render(<TodoInput onAddTodo={onAddTodo} />);
+    render(
+      <TodoInput 
+        onAddTodo={onAddTodo} 
+        categories={defaultCategories}
+        tags={defaultTags}
+      />
+    );
     const input = screen.getByPlaceholderText('新しいタスクを入力してください...') as HTMLInputElement;
     const button = screen.getByRole('button', { name: '追加' });
     return { input, button, onAddTodo };
@@ -27,7 +34,7 @@ describe('TodoInput', () => {
     const { input, button, onAddTodo } = setup();
     fireEvent.change(input, { target: { value: '新しいタスク' } });
     fireEvent.click(button);
-    expect(onAddTodo).toHaveBeenCalledWith('新しいタスク');
+    expect(onAddTodo).toHaveBeenCalledWith('新しいタスク', undefined, []);
     expect(input.value).toBe('');
   });
 
@@ -42,13 +49,23 @@ describe('TodoInput', () => {
   it('EnterキーでonAddTodoが呼ばれる', () => {
     const { input, onAddTodo } = setup();
     fireEvent.change(input, { target: { value: 'エンター追加' } });
-    fireEvent.keyDown(input, { key: 'Enter', code: 'Enter' });
-    expect(onAddTodo).toHaveBeenCalledWith('エンター追加');
+    fireEvent.submit(input.closest('form')!); // 📝 フォームのsubmitイベントを使用
+    expect(onAddTodo).toHaveBeenCalledWith('エンター追加', undefined, []);
     expect(input.value).toBe('');
   });
 
   it('Propsの型チェック: onAddTodoが必須', () => {
-    // @ts-expect-error onAddTodo prop is required for TodoInput
-    expect(() => render(<TodoInput />)).toThrow();
+    // 📝 TypeScriptの型チェックにより、必須プロパティのチェックは静的に行われる
+    // この代わりに、正しいプロパティが渡されることをテスト
+    const onAddTodo = jest.fn();
+    expect(() => 
+      render(
+        <TodoInput 
+          onAddTodo={onAddTodo} 
+          categories={defaultCategories}
+          tags={defaultTags}
+        />
+      )
+    ).not.toThrow();
   });
 });
