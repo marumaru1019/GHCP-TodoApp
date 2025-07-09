@@ -5,9 +5,12 @@ import { Todo, TodoFilter } from '@/types/todo';
 import { TodoItem } from './TodoItem';
 import { TodoInput } from './TodoInput';
 import { TodoFilter as TodoFilterComponent } from './TodoFilter';
+import { DataManagement } from './DataManagement';
+import { usePersistentTodos } from '@/lib/usePersistentState';
 
 export function TodoApp() {
-  const [todos, setTodos] = useState<Todo[]>([]);
+  // 📝 ローカルストレージと同期するTodo状態管理
+  const [todos, setTodos] = usePersistentTodos();
   const [filter, setFilter] = useState<TodoFilter>('all');
 
   const addTodo = (text: string) => {
@@ -44,6 +47,15 @@ export function TodoApp() {
     setTodos(prev => prev.filter(todo => !todo.completed));
   };
 
+  // 📝 データ管理機能のハンドラー
+  const handleTodosImported = (importedTodos: Todo[]) => {
+    setTodos(importedTodos);
+  };
+
+  const handleDataCleared = () => {
+    setTodos([]);
+  };
+
   const filteredTodos = todos.filter(todo => {
     if (filter === 'active') return !todo.completed;
     if (filter === 'completed') return todo.completed;
@@ -55,9 +67,17 @@ export function TodoApp() {
 
   return (
     <div className="max-w-2xl mx-auto p-6">
-      <h1 className="text-4xl font-bold text-center mb-8 text-gray-800 dark:text-gray-200">
-        Todo App
-      </h1>
+      <div className="flex items-center justify-between mb-8">
+        <h1 className="text-4xl font-bold text-gray-800 dark:text-gray-200">
+          Todo App
+        </h1>
+        {/* 📝 データ管理ボタンを右上に配置 */}
+        <DataManagement 
+          todos={todos}
+          onTodosImported={handleTodosImported}
+          onDataCleared={handleDataCleared}
+        />
+      </div>
       
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
         <TodoInput onAddTodo={addTodo} />
