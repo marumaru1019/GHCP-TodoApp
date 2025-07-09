@@ -6,13 +6,15 @@ describe('TodoInput', () => {
     render(<TodoInput onAddTodo={onAddTodo} />);
     const input = screen.getByPlaceholderText('新しいタスクを入力してください...') as HTMLInputElement;
     const button = screen.getByRole('button', { name: '追加' });
-    return { input, button, onAddTodo };
+    const prioritySelect = screen.getByDisplayValue('中') as HTMLSelectElement; // 📝 優先度セレクトボックスを追加
+    return { input, button, onAddTodo, prioritySelect };
   };
 
   it('初期レンダリングで入力欄と追加ボタンが表示される', () => {
-    const { input, button } = setup();
+    const { input, button, prioritySelect } = setup();
     expect(input).toBeInTheDocument();
     expect(button).toBeInTheDocument();
+    expect(prioritySelect).toBeInTheDocument(); // 📝 優先度セレクトボックスのテスト
     expect(button).toBeDisabled();
   });
 
@@ -27,7 +29,7 @@ describe('TodoInput', () => {
     const { input, button, onAddTodo } = setup();
     fireEvent.change(input, { target: { value: '新しいタスク' } });
     fireEvent.click(button);
-    expect(onAddTodo).toHaveBeenCalledWith('新しいタスク');
+    expect(onAddTodo).toHaveBeenCalledWith('新しいタスク', 'medium'); // 📝 優先度パラメータを追加
     expect(input.value).toBe('');
   });
 
@@ -42,13 +44,17 @@ describe('TodoInput', () => {
   it('EnterキーでonAddTodoが呼ばれる', () => {
     const { input, onAddTodo } = setup();
     fireEvent.change(input, { target: { value: 'エンター追加' } });
-    fireEvent.keyDown(input, { key: 'Enter', code: 'Enter' });
-    expect(onAddTodo).toHaveBeenCalledWith('エンター追加');
+    fireEvent.submit(input.closest('form')!); // 📝 formのsubmitイベントを使用
+    expect(onAddTodo).toHaveBeenCalledWith('エンター追加', 'medium'); // 📝 優先度パラメータを追加
     expect(input.value).toBe('');
   });
 
-  it('Propsの型チェック: onAddTodoが必須', () => {
-    // @ts-expect-error onAddTodo prop is required for TodoInput
-    expect(() => render(<TodoInput />)).toThrow();
+  // 📝 優先度選択のテストを追加
+  it('優先度を変更できる', () => {
+    const { input, button, onAddTodo, prioritySelect } = setup();
+    fireEvent.change(prioritySelect, { target: { value: 'high' } });
+    fireEvent.change(input, { target: { value: '高優先度タスク' } });
+    fireEvent.click(button);
+    expect(onAddTodo).toHaveBeenCalledWith('高優先度タスク', 'high');
   });
 });

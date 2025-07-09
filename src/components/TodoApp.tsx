@@ -1,21 +1,24 @@
 'use client';
 
 import { useState } from 'react';
-import { Todo, TodoFilter } from '@/types/todo';
+import { Todo, TodoFilter, TodoPriority } from '@/types/todo';
 import { TodoItem } from './TodoItem';
 import { TodoInput } from './TodoInput';
-import { TodoFilter as TodoFilterComponent } from './TodoFilter';
+import { TodoFilter as TodoFilterComponent, TodoSortType } from './TodoFilter';
 
 export function TodoApp() {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [filter, setFilter] = useState<TodoFilter>('all');
+  const [sortType, setSortType] = useState<TodoSortType>('priority'); // 📝 デフォルトは優先度順
 
-  const addTodo = (text: string) => {
+  // 📝 優先度パラメータを追加
+  const addTodo = (text: string, priority: TodoPriority) => {
     const newTodo: Todo = {
       id: crypto.randomUUID(),
       text: text.trim(),
       completed: false,
       createdAt: new Date(),
+      priority, // 📝 優先度を設定
     };
     setTodos(prev => [newTodo, ...prev]);
   };
@@ -44,11 +47,35 @@ export function TodoApp() {
     setTodos(prev => prev.filter(todo => !todo.completed));
   };
 
+  // 📝 ソート機能の実装
+  const getSortedTodos = (todos: Todo[]) => {
+    const sorted = [...todos];
+    
+    if (sortType === 'priority') {
+      // 📝 優先度順でソート（高→中→低）、同じ優先度内では作成日時順
+      const priorityOrder = { high: 3, medium: 2, low: 1 };
+      sorted.sort((a, b) => {
+        const priorityDiff = priorityOrder[b.priority] - priorityOrder[a.priority];
+        if (priorityDiff !== 0) return priorityDiff;
+        // 📝 同じ優先度の場合は作成日時順
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      });
+    } else {
+      // 📝 デフォルト（作成日時順）
+      sorted.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    }
+    
+    return sorted;
+  };
+
+  // 📝 フィルター後にソートを適用
   const filteredTodos = todos.filter(todo => {
     if (filter === 'active') return !todo.completed;
     if (filter === 'completed') return todo.completed;
     return true;
   });
+
+  const sortedTodos = getSortedTodos(filteredTodos);
 
   const activeTodosCount = todos.filter(todo => !todo.completed).length;
   const completedTodosCount = todos.filter(todo => todo.completed).length;
@@ -69,18 +96,20 @@ export function TodoApp() {
             activeTodosCount={activeTodosCount}
             completedTodosCount={completedTodosCount}
             onClearCompleted={clearCompleted}
+            currentSort={sortType} // 📝 ソート状態を渡す
+            onSortChange={setSortType} // 📝 ソート変更ハンドラーを渡す
           />
         </div>
 
         <div className="mt-6 space-y-2">
-          {filteredTodos.length === 0 ? (
+          {sortedTodos.length === 0 ? (
             <p className="text-center text-gray-500 dark:text-gray-400 py-8">
               {filter === 'active' && 'アクティブなタスクはありません'}
               {filter === 'completed' && '完了したタスクはありません'}
               {filter === 'all' && 'タスクがありません。新しいタスクを追加してください。'}
             </p>
           ) : (
-            filteredTodos.map(todo => (
+            sortedTodos.map(todo => (
               <TodoItem
                 key={todo.id}
                 todo={todo}
