@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import { TodoFilter } from './TodoFilter';
-import type { TodoFilter as TodoFilterType } from '@/types/todo';
+import { TodoFilter, TodoSortType } from './TodoFilter';
+import { TodoFilter as TodoFilterType } from '@/types/todo';
 
 describe('TodoFilter', () => {
   const defaultProps = {
@@ -9,6 +9,8 @@ describe('TodoFilter', () => {
     activeTodosCount: 2,
     completedTodosCount: 3,
     onClearCompleted: jest.fn(),
+    currentSort: 'priority' as TodoSortType, // 📝 ソート関連のプロパティを追加
+    onSortChange: jest.fn(),
   };
 
   afterEach(() => {
@@ -51,5 +53,18 @@ describe('TodoFilter', () => {
     render(<TodoFilter {...defaultProps} currentFilter="active" />);
     const activeBtn = screen.getByText('アクティブ');
     expect(activeBtn.className).toMatch(/bg-white|dark:bg-gray-600/);
+  });
+
+  // 📝 ソート機能のテストを追加
+  it('ソートボタンが表示される', () => {
+    render(<TodoFilter {...defaultProps} />);
+    expect(screen.getByText('作成順')).toBeInTheDocument();
+    expect(screen.getByText('優先度順')).toBeInTheDocument();
+  });
+
+  it('ソートボタンをクリックするとonSortChangeが呼ばれる', () => {
+    render(<TodoFilter {...defaultProps} />);
+    fireEvent.click(screen.getByText('作成順'));
+    expect(defaultProps.onSortChange).toHaveBeenCalledWith('default');
   });
 });
