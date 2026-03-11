@@ -1,12 +1,32 @@
 @import "tailwindcss";
 
+/* 📝 テーマシステムのCSS変数定義 */
 :root {
+  /* 📝 既存変数（後方互換性） */
   --background: #ffffff;
   --foreground: #171717;
   --primary: #ff0033;
   --primary-light: #ff4d6e;
   --primary-dark: #cc0029;
   --primary-hover: #e6002e;
+
+  /* 📝 新しいテーマ変数 */
+  --theme-primary: #ff0033;
+  --theme-secondary: #6b7280;
+  --theme-background: #ffffff;
+  --theme-surface: #f9fafb;
+  --theme-text-primary: #111827;
+  --theme-text-secondary: #6b7280;
+  --theme-text-disabled: #9ca3af;
+  --theme-accent: #3b82f6;
+  --theme-success: #10b981;
+  --theme-warning: #f59e0b;
+  --theme-error: #ef4444;
+  --theme-border: #e5e7eb;
+
+  /* 📝 レスポンシブ・アクセシビリティ設定 */
+  --base-font-size: 16px;
+  --transition-duration: 0.2s;
 }
 
 @theme inline {
@@ -19,15 +39,46 @@
   --font-mono: var(--font-geist-mono);
 }
 
+/* 📝 システムのダークモード検出（フォールバック） */
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #111827;
+    --foreground: #f9fafb;
+    --theme-background: #111827;
+    --theme-surface: #1f2937;
+    --theme-text-primary: #f9fafb;
+    --theme-text-secondary: #d1d5db;
+    --theme-text-disabled: #6b7280;
+    --theme-border: #374151;
   }
 }
 
+/* 📝 モーション削減対応 */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --transition-duration: 0s;
+  }
+  
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* 📝 テーマトランジション */
+* {
+  transition: 
+    color var(--transition-duration) ease,
+    background-color var(--transition-duration) ease,
+    border-color var(--transition-duration) ease,
+    box-shadow var(--transition-duration) ease;
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--theme-background);
+  color: var(--theme-text-primary);
   font-family: Arial, Helvetica, sans-serif;
+  font-size: var(--base-font-size);
+  line-height: 1.6;
 }
