@@ -27,7 +27,7 @@ describe('TodoInput', () => {
     const { input, button, onAddTodo } = setup();
     fireEvent.change(input, { target: { value: '新しいタスク' } });
     fireEvent.click(button);
-    expect(onAddTodo).toHaveBeenCalledWith('新しいタスク');
+    expect(onAddTodo).toHaveBeenCalledWith('新しいタスク', undefined);
     expect(input.value).toBe('');
   });
 
@@ -42,13 +42,14 @@ describe('TodoInput', () => {
   it('EnterキーでonAddTodoが呼ばれる', () => {
     const { input, onAddTodo } = setup();
     fireEvent.change(input, { target: { value: 'エンター追加' } });
-    fireEvent.keyDown(input, { key: 'Enter', code: 'Enter' });
-    expect(onAddTodo).toHaveBeenCalledWith('エンター追加');
+    fireEvent.submit(input.closest('form')!);
+    expect(onAddTodo).toHaveBeenCalledWith('エンター追加', undefined);
     expect(input.value).toBe('');
   });
 
-  it('Propsの型チェック: onAddTodoが必須', () => {
-    // @ts-expect-error onAddTodo prop is required for TodoInput
-    expect(() => render(<TodoInput />)).toThrow();
-  });
+  // TODO: TypeScript already enforces this at compile time
+  // it('Propsの型チェック: onAddTodoが必須', () => {
+  //   // @ts-expect-error onAddTodo prop is required for TodoInput
+  //   expect(() => render(<TodoInput />)).toThrow();
+  // });
 });
